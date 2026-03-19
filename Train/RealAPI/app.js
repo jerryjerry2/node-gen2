@@ -1,60 +1,43 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
+const productRoutes = require('./routes/productRoutes');
 
 const app = express();
 app.use(express.json());
 
 const pool = mysql.createPool({
-    host : 'localhost',
+    host : "localhost",
     user : 'root',
     password : 'mineadub',
-    database : 'ecommerce201', 
+    database : 'ecommerce305'
 });
 
-app.get('/products', async (req, res) => {
-    try {
-        let [rows] = await pool.query('select * from products');
-        console.log(rows);
+app.use(productRoutes);
 
-        res.status(200).json({
-            result : true,
-            msg : 'Get all product successfully',
-            data : rows
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            result : false,
-            msg : 'Internal Server Error',
-        })
-    }
-});
-
-app.post('/products', async (req, res) => {
+app.post('/product', async (req, res) => {
     try {
         let sql = 'insert into products (name, category, description) values (?, ?, ?)';
         let body = req.body;
         let data = [body.name, body.category, body.description];
-        const [result] = await pool.query(sql, data);
-        const [row] = await pool.query('select * from products where id = ?', [result.insertId]);
+        let [result] = await pool.query(sql, data);
+        let [row] =  await pool.query('select * from products where id = ?', [result.insertId]);
         console.log(row);
         
-        return res.json({
+        res.json({
             result : true,
             msg : 'Create Product Successfully',
             data : row[0]
         })
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
+        res.json({
             result : false,
             msg : 'Internal Server Error',
         })
     }
-    
 });
 
-app.put('/products/:id', async (req, res) => {
+app.put('/product/:id', async (req, res) => {
     try {
         console.log(req.params.id);
         console.log(req.body);
@@ -78,17 +61,91 @@ app.put('/products/:id', async (req, res) => {
             msg : 'Internal Server Error',
         })
     }
-});
+})
 
 app.delete('/product/:id', async (req, res) => {
     try {
+        let [row] = await pool.query('select * from products where id = ?', [req.params.id]);
+     
+        if(row.length == 0){
+            return res.json({
+                result : false,
+                msg : 'Product not found'
+            })
+        }
         let [result] = await pool.query('delete from products where id = ?', [req.params.id]);
-        console.log(result);
 
+        return res.json({
+            result : true,
+            msg : 'Delete Product successfully'
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            result : false,
+            msg : 'Internal Server Error'
+        })
+    }
+})
+
+app.get('/category',async (req, res) => {
+    try {
+        const [rows] = await pool.query('select * from category');
+
+        res.status(200).json({
+            result : true,
+            msg : 'Get all Category Successfully',
+            data : rows
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            result : false,
+            msg : 'Internal Server Error',
+        })
+    }
+});
+
+app.post('/category', async (req, res) => {
+    try {
+        let sql = 'insert into category (name) values (?)';
+        let body = req.body;
+        let data = [body.name];
+        let [result] = await pool.query(sql, data);
+        let [row] =  await pool.query('select * from category where id = ?', [result.insertId]);
+        console.log(row);
+        
+        res.json({
+            result : true,
+            msg : 'Create Category Successfully',
+            data : row[0]
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            result : false,
+            msg : 'Internal Server Error',
+        })
+    }
+});
+
+app.put('/category/:id', async (req, res) => {
+    try {
+        console.log(req.params.id);
+        console.log(req.body);
+        let sql = 'update category set name = ? where id = ?';
+        let body = req.body;
+        let data = [body.name, req.params.id];
+        let [result] = await pool.query(sql, data);
+        let [row] =  await pool.query('select * from category where id = ?', [req.params.id]);
+        console.log(row);
+        
         return  res.json({
             result : true,
-            msg : 'Delete Product Successfully',
+            msg : 'Update Category Successfully',
+            data : row[0]
         })
+
     } catch (error) {
         console.log(error);
         return  res.json({
@@ -96,7 +153,33 @@ app.delete('/product/:id', async (req, res) => {
             msg : 'Internal Server Error',
         })
     }
-});
+})
+
+app.delete('/category/:id', async (req, res) => {
+    try {
+        let [row] = await pool.query('select * from category where id = ?', [req.params.id]);
+     
+        if(row.length == 0){
+            return res.json({
+                result : false,
+                msg : 'Category not found'
+            })
+        }
+        let [result] = await pool.query('delete from category where id = ?', [req.params.id]);
+
+        return res.json({
+            result : true,
+            msg : 'Delete Category successfully'
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            result : false,
+            msg : 'Internal Server Error'
+        })
+    }
+})
+   
 
 app.listen(3000, () => {
     console.log('Server running on port 3000');
