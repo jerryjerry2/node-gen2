@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const productService = require('../services/productService');
 
 const pool = mysql.createPool({
     host : "localhost",
@@ -9,7 +10,7 @@ const pool = mysql.createPool({
 
 let getAll = async (req, res) => {
     try {
-        const [rows] = await pool.query('select * from products');
+        const [rows] = await productService.getAll();
 
         res.status(200).json({
             result : true,
