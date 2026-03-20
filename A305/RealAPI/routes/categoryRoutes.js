@@ -2,24 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const pool = require('../config/db');
+const categoryController = require('../controllers/categoryController');
 
-router.get('/category',async (req, res) => {
-    try {
-        const [rows] = await pool.query('select * from category');
-
-        res.status(200).json({
-            result : true,
-            msg : 'Get all Category Successfully',
-            data : rows
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            result : false,
-            msg : 'Internal Server Error',
-        })
-    }
-});
+router.get('/category', categoryController.getAll);
 
 router.post('/category', async (req, res) => {
     try {
