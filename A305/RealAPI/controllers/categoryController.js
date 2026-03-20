@@ -3,6 +3,7 @@ const pool = require('../config/db');
 const getAll = async (req, res) => {
     try {
         const [rows] = await pool.query('select * from category');
+        
 
         res.status(200).json({
             result : true,
