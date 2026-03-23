@@ -15,7 +15,21 @@ const create = async function(body){
     return data;
 }
 
+const update = async function(body, id) {
+    const result = await productModel.update(body, id);
+    const rows = await productModel.getById(id);
+    console.log(rows);
+    
+    return rows;
+}
+
+const remove = async function(id){
+    await productModel.remove(id);
+}
+
 module.exports = {
     getAll,
-    create
+    create,
+    update,
+    remove
 }

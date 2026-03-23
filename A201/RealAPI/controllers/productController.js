@@ -39,19 +39,20 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        console.log(req.params.id);
-        console.log(req.body);
-        let sql = 'update products set name = ?, category = ?, description = ? where id = ?';
-        let body = req.body;
-        let data = [body.name, body.category, body.description, req.params.id];
-        let [result] = await pool.query(sql, data);
-        let [row] =  await pool.query('select * from products where id = ?', [req.params.id]);
-        console.log(row);
+        let row =  await productModel.getById(req.params.id);
         
+        if(row.length == 0){
+            return res.json({
+                result : false,
+                msg : 'Product not found'
+            })
+        }
+        
+        let result = await productService.update(req.body, req.params.id);
         return  res.json({
             result : true,
             msg : 'Update Product Successfully',
-            data : row[0]
+            data : result[0]
         })
 
     } catch (error) {
@@ -65,7 +66,9 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
     try {
-        let [row] = await productModel.getById(req.params.id);
+        let row = await productModel.getById(req.params.id);
+        console.log(row);
+        
      
         if(row.length == 0){
             return res.json({
@@ -73,7 +76,7 @@ const remove = async (req, res) => {
                 msg : 'Product not found'
             })
         }
-        let [result] = await pool.query('delete from products where id = ?', [req.params.id]);
+        let result = await productService.remove(req.params.id);
 
         return res.json({
             result : true,

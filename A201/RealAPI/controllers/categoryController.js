@@ -1,9 +1,9 @@
 const pool = require('../config/db');
-
+const categoryService = require('../services/categoryService');
 
 const getAll = async (req, res) => {
     try {
-        const [rows] = await pool.query('select * from category');
+        const rows = await categoryService.getAll();
 
         res.status(200).json({
             result : true,
@@ -17,21 +17,16 @@ const getAll = async (req, res) => {
             msg : 'Internal Server Error',
         })
     }
-};
+}
 
 const create = async (req, res) => {
     try {
-        let sql = 'insert into category (name) values (?)';
-        let body = req.body;
-        let data = [body.name];
-        let [result] = await pool.query(sql, data);
-        let [row] =  await pool.query('select * from category where id = ?', [result.insertId]);
-        console.log(row);
+        let result = await categoryService.create(req.body);
         
         res.json({
             result : true,
             msg : 'Create Category Successfully',
-            data : row[0]
+            data : result[0]
         })
     } catch (error) {
         console.log(error);
@@ -44,19 +39,12 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        console.log(req.params.id);
-        console.log(req.body);
-        let sql = 'update category set name = ? where id = ?';
-        let body = req.body;
-        let data = [body.name, req.params.id];
-        let [result] = await pool.query(sql, data);
-        let [row] =  await pool.query('select * from category where id = ?', [req.params.id]);
-        console.log(row);
+        const result = await categoryService.update(req.body, req.params.id);
         
         return  res.json({
             result : true,
             msg : 'Update Category Successfully',
-            data : row[0]
+            data : result[0]
         })
 
     } catch (error) {
@@ -70,7 +58,7 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
     try {
-        let [row] = await pool.query('select * from category where id = ?', [req.params.id]);
+        let row = await categoryService.getById(req.params.id);
      
         if(row.length == 0){
             return res.json({
@@ -78,7 +66,8 @@ const remove = async (req, res) => {
                 msg : 'Category not found'
             })
         }
-        let [result] = await pool.query('delete from category where id = ?', [req.params.id]);
+        
+        await categoryService.remove(req.params.id);
 
         return res.json({
             result : true,
@@ -97,5 +86,5 @@ module.exports = {
     getAll,
     create,
     update,
-    remove
+    remove,
 }
