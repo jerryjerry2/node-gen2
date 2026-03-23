@@ -1,4 +1,5 @@
 const productService = require('../services/productService');
+const productModel = require('../models/productModel');
 
 const getAll = async (req, res) => {
     try {
@@ -64,7 +65,7 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
     try {
-        let [row] = await pool.query('select * from products where id = ?', [req.params.id]);
+        let [row] = await productModel.getById(req.params.id);
      
         if(row.length == 0){
             return res.json({
