@@ -51,22 +51,13 @@ const update = async (req, res) => {
         console.log(error);
         return  res.json({
             result : false,
-            msg : 'Internal Server Error',
+            msg : error.message,
         })
     }
 }
 
 const remove = async (req, res) => {
-    try {
-        let row = await categoryService.getById(req.params.id);
-     
-        if(row.length == 0){
-            return res.json({
-                result : false,
-                msg : 'Category not found'
-            })
-        }
-        
+    try {       
         await categoryService.remove(req.params.id);
 
         return res.json({
@@ -77,7 +68,7 @@ const remove = async (req, res) => {
         console.log(error);
         return res.status(500).json({
             result : false,
-            msg : 'Internal Server Error'
+            msg : error.message
         })
     }
 }

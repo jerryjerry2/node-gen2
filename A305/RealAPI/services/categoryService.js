@@ -1,39 +1,39 @@
-const pool = require('../config/db');
+const categoryModel = require('../models/categoryModel');
 
 const getAll = async function name() {
-    const [rows] = await pool.query('select * from category');
+    const rows = await categoryModel.getAll();
 
     return rows;
 }
 
 const create = async function name(body) {
-    let sql = 'insert into category (name) values (?)';
-    let data = [body.name];
-    let [result] = await pool.query(sql, data);
-    let [row] = await pool.query('select * from category where id = ?', [result.insertId]);
-
+    const result = await categoryModel.create(body);
+    const row = await categoryModel.getById(result);
+    console.log(result);
+    
     return row;
 }
 
 const update = async function (body, id) {
-    let sql = 'update category set name = ? where id = ?';
-    let data = [body.name, id];
-    let [result] = await pool.query(sql, data);
-    let [row] = await pool.query('select * from category where id = ?', [id]);
+    let row = await categoryModel.getById(id);
+    
+    if(row.length == 0){
+        throw new Error("No Category found");
+    }
+
+    await categoryModel.update(body, id);
+    row = await categoryModel.getById(id);
 
     return row;
 }
 
 const remove = async function (id) {
-    let [result] = await pool.query('delete from category where id = ?', [id]);
+    let row = await categoryModel.getById(id);
+    if(row.length == 0){
+        throw new Error("No Category found");
+    }
 
-    return result;
-}
-
-const getById = async function (id){
-    const [rows] = await pool.query('select * from category where id = ?', [id]);
-
-    return rows;
+    await categoryModel.remove(id);
 }
 
 module.exports = {
@@ -41,5 +41,4 @@ module.exports = {
     create,
     update,
     remove,
-    getById
 }
