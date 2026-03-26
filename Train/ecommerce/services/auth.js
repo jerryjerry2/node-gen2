@@ -7,13 +7,11 @@ const register = async (body) => {
     }
 
     let checkEmail = await user.findByEmail(body.email);
-    
     if(checkEmail.length > 0){
         throw new Error("Duplicate Email");
     }
 
     const hashPassword = await bcrypt.hash(body.password, 10);
-    console.log(hashPassword);
     
     const result = await user.create({
         name : body.name,
