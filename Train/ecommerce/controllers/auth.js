@@ -18,6 +18,26 @@ const register = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    try {
+        const result = await auth.login(req.body);
+
+        res.json({
+            result : true,
+            msg : 'Login Successfully',
+            data : result
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            result : true,
+            msg : error.message,
+        })
+    }
+    
+}
+
 module.exports = {
-    register
+    register,
+    login
 }
