@@ -42,7 +42,7 @@ const login = async (body) => {
     }
     
     const token = jwt.sign(
-        {id : userInfo.id, email : userInfo.email},
+        {id : userInfo[0].id, email : userInfo[0].email},
         jwtConfig.secret,
         {expiresIn : jwtConfig.expiresIn}
     )
@@ -54,7 +54,15 @@ const login = async (body) => {
     }
 }
 
+const getMe = (id) => {
+    let row = user.findById(id);
+
+    return row;
+}
+
+
 module.exports = {
     register,
-    login
+    login,
+    getMe
 }

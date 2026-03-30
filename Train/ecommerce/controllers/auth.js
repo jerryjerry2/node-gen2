@@ -34,10 +34,29 @@ const login = async (req, res) => {
             msg : error.message,
         })
     }
+}
+
+const getMe = async (req, res) => {
+    try {
+        const result = await auth.getMe(req.user.id);
+
+        res.json({
+            result : true,
+            msg : 'Get Profile Successfully',
+            data : result
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            result : true,
+            msg : error.message,
+        })
+    }
     
 }
 
 module.exports = {
     register,
-    login
+    login,
+    getMe
 }
