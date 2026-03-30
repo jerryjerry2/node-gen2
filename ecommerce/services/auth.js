@@ -22,7 +22,6 @@ const register = async (body) => {
     });
 
     let row = await user.findById(result);
-    
     return row;
 }
 
