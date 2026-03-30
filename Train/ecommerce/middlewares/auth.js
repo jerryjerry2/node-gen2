@@ -14,9 +14,6 @@ const isLogin = (req, res, next) => {
         }
 
         const parts = authHeader.split(' ');
-        //console.log(parts);
-
-        console.log(parts.length !== 2, parts[0]);
         
         if(parts.length !== 2 || parts[0] !== 'Bearer'){
             return res.json({
@@ -27,8 +24,6 @@ const isLogin = (req, res, next) => {
 
         const token = parts[1];
         const decode = jwt.verify(token, jwtConfig.secret);
-        console.log(decode);
-        
 
         req.user = decode;
         next();
