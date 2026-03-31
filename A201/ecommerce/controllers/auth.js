@@ -24,6 +24,12 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         let row = await auth.login(req.body);
+
+        return res.json({
+            result : true,
+            msg : 'Login Successfully',
+            data: row
+        })
         
     } catch (error) {
         console.log(error);
@@ -34,7 +40,17 @@ const login = async (req, res) => {
     }
 }
 
+const getMe = (req, res) => {
+    try {
+        console.log(123);
+        
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
     register,
-    login
+    login,
+    getMe
 }
