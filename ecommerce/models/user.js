@@ -1,7 +1,7 @@
 const pool = require('../configs/db');
 
 const findByEmail = async (email) => {
-    let [row] = await pool.query('select email from users where email = ?', [email]);
+    let [row] = await pool.query('select id, name, email, password, phone, address from users where email = ?', [email]);
 
     return row;
 }
