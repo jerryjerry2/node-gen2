@@ -40,12 +40,22 @@ const login = async (req, res) => {
     }
 }
 
-const getMe = (req, res) => {
+const getMe = async (req, res) => {
     try {
-        console.log(123);
+        let row = await auth.getMe(req.user.id);
+
+        return res.json({
+            result : true,
+            msg : 'Get Profile Successfully',
+            data: row
+        })        
         
     } catch (error) {
-        
+        console.log(error);
+        return res.json({
+            result : false,
+            msg : error.message
+        })
     }
 }
 

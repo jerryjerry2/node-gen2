@@ -47,17 +47,21 @@ const login = async (body) => {
         jwtConfig.secret,
         {expiresIn : jwtConfig.expireIn}
     )
+
+    await user.addToken(token, userInfo[0].id);
+    let row = await user.getById(userInfo[0].id);
     
-    return {
-        id : userInfo[0].id,
-        name : userInfo[0].name,
-        email : userInfo[0].email,
-        phone : userInfo[0].phone,
-        token : token
-    }
+    return row;
+}
+
+const getMe = async (id) => {
+    const row = await user.getById(id);
+
+    return row;
 }
 
 module.exports = {
     register,
-    login
+    login,
+    getMe
 }
