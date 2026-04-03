@@ -49,19 +49,20 @@ const login = async (body) => {
         {expiresIn : jwtConfig.expireIn}
     );
 
-    return {
-        name : UserInfo[0].name,
-        email : UserInfo[0].email,
-        address : UserInfo[0].address,
-        phone : UserInfo[0].phone,
-        token : token
-    }
-    
-    
-    
+    await user.addToken(token, UserInfo[0].id);
+    const row = await user.findById(UserInfo[0].id);
+
+    return row;
+}
+
+const getMe = async (id) => {
+    let row = await user.findById(id);
+
+    return row;
 }
 
 module.exports = {
     register,
-    login
+    login,
+    getMe
 }

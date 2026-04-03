@@ -24,6 +24,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const result = await authService.login(req.body);
+        
 
          return res.json({
             result : true,
@@ -39,12 +40,22 @@ const login = async (req, res) => {
     }
 }
 
-const getMe = (req, res) => {
+const getMe = async (req, res) => {
     try {
-        console.log(123);
-        
+        const row = await authService.getMe(req.user.id);
+
+        return res.json({
+            result : true,
+            msg : 'Get Profile Successfully',
+            data : row
+        })
+
     } catch (error) {
-        
+        console.log(error);
+         return res.json({
+            result : false,
+            msg : error.message
+        })
     }
 }
 
