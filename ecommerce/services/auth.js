@@ -46,15 +46,12 @@ const login = async (body) => {
         {id : UserInfo[0].id, email : UserInfo[0].email},
         jwtConfig.secret,
         {expiresIn : jwtConfig.expireIn}
-    )
+    );
+
+    await user.addToken(token, UserInfo[0].id);
+    let [row] = await user.findById(UserInfo[0].id);
     
-    return {
-        name : UserInfo[0].name,
-        email : UserInfo[0].email,
-        phone : UserInfo[0].phone,
-        address :UserInfo[0].address,
-        token : token
-    }
+    return row;
 }
 
 const getMe = async (id) => {
@@ -63,8 +60,13 @@ const getMe = async (id) => {
     return row;
 }
 
+const logout = async (id) => {
+    await user.deleteToken(id);
+}
+
 module.exports = {
     register,
     login,
-    getMe
+    getMe,
+    logout
 }

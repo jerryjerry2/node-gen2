@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../configs/jwt');
+const user = require('../models/user');
 
-const isLogin = (req, res, next) => {
+const isLogin = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
-        console.log(authHeader);
         
         if(!authHeader){
             return res.json({
@@ -14,7 +14,7 @@ const isLogin = (req, res, next) => {
         }
 
         let parts = authHeader.split(' ');
-        console.log(parts);
+        
         if(parts.length !== 2 || parts[0] !== 'Bearer'){
             return res.json({
                 result : false,
@@ -24,15 +24,20 @@ const isLogin = (req, res, next) => {
 
         let token = parts[1];
         let decode = jwt.verify(token, jwtConfig.secret);
-        //console.log(decode);
 
+        let row = await user.getByToken(token);
+        console.log(row);
+        if(row.length == 0){
+            throw new Error("Invalid or Expired Token");
+        }
+        
         req.user = decode;
-        
         next();
-        
-        
     } catch (error) {
-        
+        return res.json({
+            result : false,
+            msg : 'Invalid or Expired Token'
+        })
     }
 }
 
