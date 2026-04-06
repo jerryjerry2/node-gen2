@@ -13,8 +13,8 @@ const findById = async (id) => {
 }
 
 const create = async (body) => {
-    let arr = [body.name, body.email, body.password]
-    const [result] = await pool.query('insert into users (name, email, password) values (?,?,?)', arr);
+    let arr = [body.name, body.email, body.password, body.verificationToken, body.verificationExpired];
+    const [result] = await pool.query('insert into users (name, email, password, verification_token, verification_expires) values (?,?,?,?,?)', arr);
 
     return result.insertId;
 }

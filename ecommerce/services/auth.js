@@ -2,6 +2,8 @@ const user = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../configs/jwt');
+const crypto = require('crypto');
+const mailService = require('../services/mailService');
 
 const register = async (body) => {
     if(!body.name || !body.email || !body.password){
@@ -14,13 +16,19 @@ const register = async (body) => {
     }
 
     const hashPassword = await bcrypt.hash(body.password, 10);
-    console.log(hashPassword);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationExpired = new Date(Date.now() + 60 * 60 * 1000); //60min or 1h
+    console.log(verificationToken);
     
     const result = await user.create({
         name : body.name,
         email : body.email,
-        password : hashPassword
-    })
+        password : hashPassword,
+        verificationToken,
+        verificationExpired
+    }); 
+
+    await mailService.sendVerificationEmail(body.email, verificationToken);
 
     let row = await user.findById(result);
     
@@ -40,6 +48,10 @@ const login = async (body) => {
     let isMatch = await bcrypt.compare(body.password, UserInfo[0].password);
     if(!isMatch){
         throw new Error("Email and Password invalid"); 
+    }
+
+    if(!UserInfo[0].is_verified){
+        throw new Error("You need to verify email"); 
     }
     
     const token = jwt.sign(
