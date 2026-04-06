@@ -7,14 +7,21 @@ const findByEmail = async (email) => {
 }
 
 const findById = async (id) => {
-    let [row] = await pool.query('select id, name, phone, address, role, token from users where id = ?', [id]);
+    let [row] = await pool.query('select id, name, phone, address, role, token, is_verified from users where id = ?', [id]);
+
+    return row;
+}
+
+const findByVerificationToken = async (token) => {
+    let [row] = await pool.query(`select id, name, email, is_verified, 
+    verification_token, verification_expires from users where verification_token = ?`, [token]);
 
     return row;
 }
 
 const create = async (body) => {
-    let data = [body.name, body.email, body.password];
-    let [result] = await pool.query('insert into users (name, email, password) values (?, ?, ?)', data);
+    let data = [body.name, body.email, body.password, body.verification_token, body.verificationExpires];
+    let [result] = await pool.query('insert into users (name, email, password, verification_token, verification_expires) values (?, ?, ?, ?, ?)', data);
 
     return result.insertId;
 }
@@ -33,11 +40,25 @@ const deleteToken = async (id) => {
     await pool.query('update users set token = null where id = ?', [id]);
 }
 
+const verifyEmail = async (id) => {
+    await pool.query('update users set is_verified = 1 where id = ?', [id]);
+}
+
+const resendVerificationEmail = async (body) => {
+    let arr = [body.verificationToken, body.verificationExpires, body.id];
+
+    await pool.query(`update users set verification_token = ?, verification_expires = ?
+    WHERE id = ?`, arr);
+}
+
 module.exports = {
     findByEmail,
     findById,
     create,
     addToken,
     findByToken,
-    deleteToken
+    deleteToken,
+    findByVerificationToken,
+    verifyEmail,
+    resendVerificationEmail
 }
