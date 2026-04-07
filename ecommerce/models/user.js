@@ -23,9 +23,21 @@ const addToken = async (token, id) => {
     await pool.query('update users set token = ? where id = ?', [token, id]);
 }
 
+const removeToken = async (id) => {
+    await pool.query('update users set token = null where id = ?', [id]);
+}
+
+const findByToken = async (token) => {
+    let [row] = await pool.query('select token from users where token = ?', [token]);
+
+    return row;
+}
+
 module.exports = {
     findByEmail,
     findById,
     create,
-    addToken
+    addToken,
+    removeToken,
+    findByToken
 }

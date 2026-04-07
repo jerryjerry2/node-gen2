@@ -52,7 +52,24 @@ const getMe = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-         return res.json({
+        return res.json({
+            result : false,
+            msg : error.message
+        })
+    }
+}
+
+const logout = async (req, res) => {
+    try {
+        await authService.logout(req.user.id);
+
+        return res.json({
+            result : true,
+            msg : 'Logout Successfully',
+        })
+    } catch (error) {
+        console.log(error);
+        return res.json({
             result : false,
             msg : error.message
         })
@@ -62,5 +79,6 @@ const getMe = async (req, res) => {
 module.exports = {
     register,
     login,
-    getMe
+    getMe,
+    logout
 }

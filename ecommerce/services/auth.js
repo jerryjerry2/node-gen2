@@ -61,8 +61,13 @@ const getMe = async (id) => {
     return row;
 }
 
+const logout = async (id) => {
+    await user.removeToken(id);
+}
+
 module.exports = {
     register,
     login,
-    getMe
+    getMe,
+    logout
 }
