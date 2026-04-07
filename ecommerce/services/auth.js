@@ -17,8 +17,7 @@ const register = async (body) => {
 
     const hashPassword = await bcrypt.hash(body.password, 10);
     const verificationToken = crypto.randomBytes(32).toString('hex');
-    const verificationExpired = new Date(Date.now() + 60 * 60 * 1000); //60min or 1h
-    console.log(verificationToken);
+    const verificationExpired = new Date(Date.now() + 1 * 60 * 1000); //60min or 1h
     
     const result = await user.create({
         name : body.name,
@@ -76,9 +75,64 @@ const logout = async (id) => {
     await user.deleteToken(id);
 }
 
+const verifyEmail = async (token) => {
+    if(!token){
+        throw new Error("Token is required");
+    }
+
+    let UserInfo = await user.findByVerificationEmail(token);
+    if(UserInfo.length == 0){
+        throw new Error("Invalid Token");
+    }
+
+    if(UserInfo[0].is_verified){ 
+        throw new Error("Email already Verified");
+    }
+
+    console.log(new Date(UserInfo[0].verification_expires));
+    if(!UserInfo[0].verification_expires || new Date(UserInfo[0].verification_expires) < new Date()){
+        throw new Error("Link already expired");
+    }
+    
+    await user.verifiedEmail(UserInfo[0].id);
+    
+    return { message : 'Email Verified Successfully'}
+}
+
+const resendVerificationLink = async (email) => {
+    if(!email){
+        throw new Error("Email is required");
+    }
+
+    let userInfo = await user.findByEmail(email);
+    console.log(userInfo);
+    if(userInfo.length == 0){
+        throw new Error("Email not found");
+    }
+
+    if(userInfo[0].is_verified){
+        throw new Error("Email already Verified");
+    }
+
+    const verification_token = crypto.randomBytes(32).toString('hex');
+    const verification_expires = new Date(Date.now() + 60 * 60 * 1000); //60min or 1h
+
+    await user.resendVerificationLink({
+        id : userInfo[0].id,
+        verification_token,
+        verification_expires
+    })
+    
+    await mailService.sendVerificationEmail(email, verification_token);
+
+    return {message : 'Resend Successfully'}
+}
+
 module.exports = {
     register,
     login,
     getMe,
-    logout
+    logout,
+    verifyEmail,
+    resendVerificationLink
 }

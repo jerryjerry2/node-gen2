@@ -8,5 +8,7 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.get('/me', isLogin, authController.getMe);
 router.delete('/logout', isLogin, authController.logout);
+router.get('/verify-email', authController.verifyEmail);
+router.post('/resend-verificationLink', authController.resendVerificationLink)
 
 module.exports = router;

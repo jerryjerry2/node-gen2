@@ -72,9 +72,46 @@ const logout = async (req, res) => {
     }
 }
 
+const verifyEmail = async (req, res) => {
+    try {
+        let result = await authService.verifyEmail(req.query.token);
+        
+        return res.json({
+            result : true,
+            msg : result.message
+        })
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            result : false,
+            msg : error.message
+        })
+    }
+}
+
+const resendVerificationLink = async (req, res) => {
+    try {
+        console.log(req.body);
+        let result = await authService.resendVerificationLink(req.body.email);
+        
+        return res.json({
+            result : true,
+            msg : result.message
+        })
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            result : false,
+            msg : error.message
+        })
+    }
+}
+
 module.exports = {
     register,
     login,
     getMe,
-    logout
+    logout,
+    verifyEmail,
+    resendVerificationLink
 }
