@@ -90,6 +90,8 @@ const verifyEmail = async (token) => {
     }
 
     console.log(new Date(UserInfo[0].verification_expires));
+    console.log(new Date());
+    
     if(!UserInfo[0].verification_expires || new Date(UserInfo[0].verification_expires) < new Date()){
         throw new Error("Link already expired");
     }
