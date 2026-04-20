@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const user = require('../models/user');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../configs/jwt');
+const mailService = require('./mailService');
 
 const register = async (body) => {
     //console.log(body);
@@ -15,13 +17,20 @@ const register = async (body) => {
     }
 
     let hashpassword = await bcrypt.hash(body.password, 10);
-    console.log(hashpassword);
+    let verificationToken = crypto.randomBytes(32).toString('hex');
+    let verificationExpired = new Date(Date.now() + 60 * 60 * 1000);
+    console.log(verificationToken);
+
     
     let result = await user.create({
         name : body.name,
         email : body.email,
-        password : hashpassword
+        password : hashpassword,
+        verificationToken,
+        verificationExpired
     });
+
+    await mailService.sendVerificationEmail(body.email, verificationToken);
 
     let row = await user.findById(result);
     return row;
