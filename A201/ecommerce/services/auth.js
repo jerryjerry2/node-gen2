@@ -17,7 +17,7 @@ const register = async (body) => {
 
     let hashPassword = await bcrypt.hash(body.password, 10);
     let verificationToken = crypto.randomBytes(32).toString('hex');
-    let verificationExpires = new Date(Date.now() + 60 * 60 * 1000);
+    let verificationExpires = new Date(Date.now() + 3 * 60 * 1000);
     console.log(verificationToken);
     
     let result = await user.create({
@@ -77,9 +77,34 @@ const logout = async (id) => {
     await user.deleteToken(id);
 }
 
+const verifyEmail = async (token) => {
+    console.log(token);
+    if(!token){
+        throw new Error("Token is required");
+    }
+
+    let userInfo = await user.findByVerificationToken(token);
+    if(userInfo.length == 0){
+        throw new Error("Invalid Token");
+    }
+    
+    if(userInfo[0].is_verified){
+        throw new Error("Email already verify");
+    }
+
+    if(!userInfo[0].verification_expires || new Date(userInfo[0].verification_expires) < new Date()){
+        throw new Error("Token is expired");
+    }
+
+    await user.verifyEmail(userInfo[0].id);
+
+    return { message : 'Email Verify Successfully'}
+}
+
 module.exports = {
     register,
     login,
     getMe,
-    logout
+    logout,
+    verifyEmail
 }

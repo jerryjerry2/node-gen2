@@ -33,6 +33,16 @@ const deleteToken = async (id) => {
     await pool.query('update users set token = null where id = ?', [id]);
 }
 
+const findByVerificationToken = async (token) => {
+    let [row] = await pool.query('select id, name, email, phone, address, token, is_verified, verification_token, verification_expires from users where verification_token = ?' , [token]);
+
+    return row;
+}
+
+const verifyEmail = async (id) => {
+    await pool.query('update users set is_verified = 1 where id = ?', [id]);
+}
+
 
 module.exports = {
     getByEmail,
@@ -40,5 +50,7 @@ module.exports = {
     create,
     addToken,
     findByToken,
-    deleteToken
+    deleteToken,
+    findByVerificationToken,
+    verifyEmail
 }
