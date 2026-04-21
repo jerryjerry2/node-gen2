@@ -2,7 +2,7 @@ const authService = require('../services/auth');
 
 const register = async (req, res) => {
     try {
-        const result = await authService.register(req.body);
+        const result = await authService.register(req.validateData);
 
         return res.json({
             result : true,
@@ -20,7 +20,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        let result = await authService.login(req.body);
+        let result = await authService.login(req.validateData);
 
         res.json({
             result : true,
@@ -92,7 +92,7 @@ const verifyEmail = async (req, res) => {
 const resendVerificationLink = async (req, res) => {
     try {
         console.log(req.body);
-        let result = await authService.resendVerificationLink(req.body.email);
+        let result = await authService.resendVerificationLink(req.validateData.email);
         
         return res.json({
             result : true,

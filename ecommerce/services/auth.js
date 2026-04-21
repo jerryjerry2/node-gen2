@@ -6,9 +6,6 @@ const crypto = require('crypto');
 const mailService = require('../services/mailService');
 
 const register = async (body) => {
-    if(!body.name || !body.email || !body.password){
-        throw new Error("Name, Email, Password is required"); 
-    }
 
     const checkEmail = await user.findByEmail(body.email);
     if(checkEmail.length > 0){
