@@ -43,6 +43,12 @@ const verifyEmail = async (id) => {
     await pool.query('update users set is_verified = 1 where id = ?', [id]);
 }
 
+const resendVerificationEmail = async (body) => {
+    let arr = [body.verificationToken, body.verificationExpires, body.id];
+
+    await pool.query('update users set verification_token = ?, verification_expires = ? where id = ?', arr);
+}
+
 
 module.exports = {
     getByEmail,
@@ -52,5 +58,6 @@ module.exports = {
     findByToken,
     deleteToken,
     findByVerificationToken,
-    verifyEmail
+    verifyEmail,
+    resendVerificationEmail
 }
