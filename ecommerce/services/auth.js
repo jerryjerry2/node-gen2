@@ -18,7 +18,7 @@ const register = async (body) => {
 
     let hashpassword = await bcrypt.hash(body.password, 10);
     let verificationToken = crypto.randomBytes(32).toString('hex');
-    let verificationExpired = new Date(Date.now() + 60 * 60 * 1000);
+    let verificationExpired = new Date(Date.now() + 2 * 60 * 1000);
     console.log(verificationToken);
 
     
@@ -58,6 +58,11 @@ const login = async (body) => {
         {expiresIn : jwtConfig.expireIn}
     );
 
+    // console.log(UserInfo);return;
+    if(!UserInfo[0].is_verified){
+        throw new Error("Email not verify");
+    }
+    
     await user.addToken(token, UserInfo[0].id);
     const row = await user.findById(UserInfo[0].id);
 
@@ -74,9 +79,34 @@ const logout = async (id) => {
     await user.removeToken(id);
 }
 
+const verifyEmail = async (token) => {
+    if(!token){
+        throw new Error("Token is required");
+    }
+
+    let userInfo = await user.findByVerificationEmail(token);
+    console.log(userInfo);
+    if(userInfo.length == 0){
+        throw new Error("Invalid Token");
+    }
+
+    if(userInfo[0].is_verified){
+        throw new Error("Email already verify");
+    }
+
+    if(!userInfo[0].verification_expires || new Date(userInfo[0].verification_expires) < new Date()){
+        throw new Error("Token is expired");
+    }
+
+    await user.verifyEmail(userInfo[0].id);
+    
+    return { message : 'Email verify Successfully' }
+}
+
 module.exports = {
     register,
     login,
     getMe,
-    logout
+    logout,
+    verifyEmail
 }
