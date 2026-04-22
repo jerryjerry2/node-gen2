@@ -103,10 +103,39 @@ const verifyEmail = async (token) => {
     return { message : 'Email verify Successfully' }
 }
 
+const resendVerificationEmail = async (email) => {
+    if(!email) {
+        throw new Error("Email is required");
+    }
+
+    const userInfo = await user.findByEmail(email);
+    if(userInfo.length == 0){
+        throw new Error("Invalid Email");
+    }
+
+    if(userInfo[0].is_verified){
+        throw new Error("Email already verified");
+    }
+
+    let verificationToken = crypto.randomBytes(32).toString('hex');
+    let verificationExpired = new Date(Date.now() + 2 * 60 * 1000);
+
+    await user.resendVerificationEmail({
+        verificationToken,
+        verificationExpired,
+        id : userInfo[0].id
+    })
+
+    await mailService.sendVerificationEmail(email, verificationToken);
+
+    return { 'message' : 'Resend Email Successfully' };
+}
+
 module.exports = {
     register,
     login,
     getMe,
     logout,
-    verifyEmail
+    verifyEmail,
+    resendVerificationEmail
 }

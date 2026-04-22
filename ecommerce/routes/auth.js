@@ -9,6 +9,7 @@ router.post('/login', authController.login);
 router.get('/me', authMiddleware.isLogin, authController.getMe);
 router.delete('/logout', authMiddleware.isLogin, authController.logout);
 router.get('/verify-email', authController.verifyEmail);
+router.put('/resend-verificationEmail', authController.resendVerificationEmail);
 
 
 module.exports = router;
