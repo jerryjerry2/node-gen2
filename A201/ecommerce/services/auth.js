@@ -6,10 +6,6 @@ const crypto = require('crypto');
 const sendMailVerification = require('./mailService');
 
 const register = async (body) => {
-    if(!body.name || !body.email || !body.password){
-        throw new Error("Name, Email, Password is required");
-    }
-
     let checkEmail = await user.getByEmail(body.email);
     if(checkEmail.length > 0) {
         throw new Error("Email Duplicate");
