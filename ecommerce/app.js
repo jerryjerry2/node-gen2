@@ -4,6 +4,8 @@ const authRoute = require('./routes/auth');
 const app = express();
 app.use(express.json());
 
+require('dotenv').config();
+
 app.use('/api', authRoute);
 
-app.listen(3000);
+app.listen(process.env.PORT);
