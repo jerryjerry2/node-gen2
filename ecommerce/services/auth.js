@@ -6,11 +6,6 @@ const jwtConfig = require('../configs/jwt');
 const mailService = require('./mailService');
 
 const register = async (body) => {
-    //console.log(body);
-    if(!body.name || !body.email || !body.password){
-        throw new Error("Name, Email, Password is required");
-    }
-
     let checkEmail = await user.findByEmail(body.email);
     if(checkEmail.length > 0){
         throw new Error("Email Duplicate");
